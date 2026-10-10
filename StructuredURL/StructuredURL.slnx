@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="StructuredURL.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
