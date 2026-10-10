@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ratelimiter/Ratelimiter.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
