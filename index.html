@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSD Lab Programs (3, 4, 5, 6, 7)</title>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #141414;
+    color: #cccccc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    user-select: none;
+}
+.container {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+    padding: 5px;
+    height: 100vh;
+    width: 100vw;
+}
+.column {
+    background: #1b1b1b;
+    border: 1px solid #2b2b2b;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+.big-btn {
+    width: 100%;
+    height: 80px;
+    background: #242424;
+    border: none;
+    border-bottom: 1px solid #333333;
+    color: #cccccc;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 4px;
+    transition: background 0.1s ease, color 0.1s ease;
+    outline: none;
+}
+.big-btn:hover {
+    background: #2e2e2e;
+    color: #ffffff;
+}
+.big-btn:active {
+    background: #383838;
+}
+.big-btn.copied {
+    background: #1e2e22;
+    color: #8ae096;
+    border-bottom-color: #2e5933;
+}
+.num-badge {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #e0e0e0;
+}
+.action-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+.meta-desc {
+    font-size: 9px;
+    color: #777777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
+}
+.cmd-strip {
+    background: #181818;
+    border-bottom: 1px solid #262626;
+    padding: 3px 6px;
+    font-family: Consolas, monospace;
+    font-size: 8.5px;
+    color: #888888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.code-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #111111;
+    padding: 7px;
+    cursor: pointer;
+    user-select: text;
+}
+.code-area::-webkit-scrollbar {
+    width: 4px;
+}
+.code-area::-webkit-scrollbar-track {
+    background: #111111;
+}
+.code-area::-webkit-scrollbar-thumb {
+    background: #2b2b2b;
+    border-radius: 2px;
+}
+.code-area::-webkit-scrollbar-thumb:hover {
+    background: #444444;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9.5px;
+    line-height: 1.22;
+    color: #b5b5b5;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.output-box {
+    background: #161616;
+    border-top: 1px solid #262626;
+    padding: 5px 7px;
+    max-height: 125px;
+    overflow-y: auto;
+    font-family: Consolas, monospace;
+    font-size: 8.5px;
+    line-height: 1.2;
+    color: #888888;
+    user-select: text;
+}
+.output-box::-webkit-scrollbar {
+    width: 3px;
+}
+.output-box::-webkit-scrollbar-thumb {
+    background: #333;
+}
+.output-title {
+    font-weight: 700;
+    font-size: 8.5px;
+    color: #aaa;
+    margin-bottom: 2px;
+}
+#toast {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #252525;
+    color: #8ae096;
+    border: 1px solid #383838;
+    padding: 5px 14px;
+    font-size: 11px;
+    border-radius: 3px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 100;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- COLUMN 1 -->
+    <div class="column">
+        <button class="big-btn" id="btn-1" onclick="copyCode(1)">
+            <span class="num-badge">1</span>
+            <span class="action-label" id="label-1">CLICK TO COPY</span>
+            <span class="meta-desc">Prog 3: Static & Rate Limit</span>
+        </button>
+        <div class="cmd-strip" title="Run command">npm init -y &amp;&amp; npm install express express-rate-limit &amp;&amp; node app.js</div>
+        <div class="code-area" title="Click button or press 1 to copy" onclick="copyCode(1)">
+            <pre><code id="code-1"></code></pre>
+        </div>
+        <div class="output-box">
+            <div class="output-title">OUTPUT / TEST:</div>
+            <div>GET http://localhost:3000/<br>-> Displays index.html with CSS and image (Status: 200 OK)<br><br>GET http://localhost:3000/hello<br>-> Hello Express.js (Status: 200 OK)<br><br>GET http://localhost:3000/xyz<br>-> Page Not Found (Status: 404 Not Found)<br><br>After 5 requests in 1 minute:<br>-> Too many requests, please try again later. (Status: 429)</div>
+        </div>
+    </div>
+    <!-- COLUMN 2 -->
+    <div class="column">
+        <button class="big-btn" id="btn-2" onclick="copyCode(2)">
+            <span class="num-badge">2</span>
+            <span class="action-label" id="label-2">CLICK TO COPY</span>
+            <span class="meta-desc">Prog 4: Hierarchical Routing</span>
+        </button>
+        <div class="cmd-strip" title="Run command">npm init -y &amp;&amp; npm install express &amp;&amp; node app.js</div>
+        <div class="code-area" title="Click button or press 2 to copy" onclick="copyCode(2)">
+            <pre><code id="code-2"></code></pre>
+        </div>
+        <div class="output-box">
+            <div class="output-title">OUTPUT / TEST:</div>
+            <div>GET http://localhost:3000/college/students/profile/view<br>-> Student Profile View<br><br>GET http://localhost:3000/college/students/profile/101<br>-> Student Profile ID: 101<br><br>GET http://localhost:3000/college/marks/view<br>-> Marks View<br><br>GET http://localhost:3000/college/marks/101<br>-> Marks for Student ID: 101<br><br>Console Log Output:<br>College middleware: GET /college/students/profile/view<br>Profile middleware</div>
+        </div>
+    </div>
+    <!-- COLUMN 3 -->
+    <div class="column">
+        <button class="big-btn" id="btn-3" onclick="copyCode(3)">
+            <span class="num-badge">3</span>
+            <span class="action-label" id="label-3">CLICK TO COPY</span>
+            <span class="meta-desc">Prog 5: Request Validation</span>
+        </button>
+        <div class="cmd-strip" title="Run command">npm init -y &amp;&amp; npm install express express-validator &amp;&amp; node app.js</div>
+        <div class="code-area" title="Click button or press 3 to copy" onclick="copyCode(3)">
+            <pre><code id="code-3"></code></pre>
+        </div>
+        <div class="output-box">
+            <div class="output-title">OUTPUT / TEST:</div>
+            <div>POST http://localhost:3000/user/register<br>Valid JSON: {"name": "John", "email": "john@gmail.com", "age": 25}<br>Response: Validation Successful (Status: 200 OK)<br><br>Invalid JSON: {"name": "", "email": "abc", "age": 15}<br>Response: Status 400 Bad Request<br>{"errors": [{"msg": "Name is required"}, {"msg": "Invalid email format"}, {"msg": "Age must be at least 18"}]}</div>
+        </div>
+    </div>
+    <!-- COLUMN 4 -->
+    <div class="column">
+        <button class="big-btn" id="btn-4" onclick="copyCode(4)">
+            <span class="num-badge">4</span>
+            <span class="action-label" id="label-4">CLICK TO COPY</span>
+            <span class="meta-desc">Prog 6: Mongoose POST & GET</span>
+        </button>
+        <div class="cmd-strip" title="Run command">npm init -y &amp;&amp; npm install express mongoose &amp;&amp; node app.js</div>
+        <div class="code-area" title="Click button or press 4 to copy" onclick="copyCode(4)">
+            <pre><code id="code-4"></code></pre>
+        </div>
+        <div class="output-box">
+            <div class="output-title">OUTPUT / TEST:</div>
+            <div>POST http://localhost:3000/students<br>Body: {"name": "Rahul", "usn": "4VV23IS001", "branch": "ISE", "semester": 5}<br>Response (201 Created):<br>{"message": "Student created successfully", "student": {"_id": "...", "name": "Rahul", "usn": "4VV23IS001", "branch": "ISE", "semester": 5}}<br><br>GET http://localhost:3000/students<br>Response (200 OK):<br>{"message": "Students retrieved successfully", "students": [{"_id": "...", "name": "Rahul", "usn": "4VV23IS001", "branch": "ISE", "semester": 5}]}</div>
+        </div>
+    </div>
+    <!-- COLUMN 5 -->
+    <div class="column">
+        <button class="big-btn" id="btn-5" onclick="copyCode(5)">
+            <span class="num-badge">5</span>
+            <span class="action-label" id="label-5">CLICK TO COPY</span>
+            <span class="meta-desc">Prog 7: Mongoose PUT & DEL</span>
+        </button>
+        <div class="cmd-strip" title="Run command">npm init -y &amp;&amp; npm install express mongoose &amp;&amp; node app.js</div>
+        <div class="code-area" title="Click button or press 5 to copy" onclick="copyCode(5)">
+            <pre><code id="code-5"></code></pre>
+        </div>
+        <div class="output-box">
+            <div class="output-title">OUTPUT / TEST:</div>
+            <div>PUT http://localhost:3000/students/4VV23IS001<br>Body: {"name": "Rahul Kumar", "branch": "CSE", "semester": 6}<br>Response (200 OK):<br>{"message": "Student updated successfully", "student": {"_id": "...", "name": "Rahul Kumar", "usn": "4VV23IS001", "branch": "CSE", "semester": 6}}<br><br>DELETE http://localhost:3000/students/4VV23IS002<br>Response (200 OK):<br>{"message": "Student deleted successfully", "student": {"_id": "...", "name": "xyz", "usn": "4VV23IS002"}}</div>
+        </div>
+    </div>
+</div>
+
+<div id="toast">Copied to clipboard</div>
+
+<script>
+const codes = {
+    1: "// --- public/index.html ---\n<!DOCTYPE html>\n<html>\n<head>\n<title>Express Static Resource Demo</title>\n<link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n<h1>Welcome to Express.js</h1>\n<p>This page demonstrates static resources.</p>\n<img src=\"image.jpg\" width=\"300\">\n</body>\n</html>\n\n// --- public/style.css ---\nbody{\nfont-family: Arial;\ntext-align: center;\n}\nh1{\ncolor: blue;\n}\np{\ncolor: green;\n}\n\n// --- app.js ---\nconst express = require('express');\nconst rateLimit = require('express-rate-limit');\nconst app = express();\napp.use(express.static('public'));\nconst limiter = rateLimit({\nwindowMs: 1 * 60 * 1000,\nmax: 5,\nmessage: 'Too many requests, please try again later.'\n});\napp.use(limiter);\napp.get('/hello', (req, res) => {\nres.send('Hello Express.js');\n});\napp.use((req, res) => {\nres.status(404).send('Page Not Found');\n});\napp.listen(3000, () => {\nconsole.log('Server running at http://localhost:3000');\n});",
+    2: "// --- routes/college.js ---\nconst express = require('express');\nconst router = express.Router();\nconst studentsRouter = require('./students');\nconst marksRouter = require('./marks');\nrouter.use((req, res, next) => {\nconsole.log('College middleware:', req.method, req.originalUrl);\nnext();\n});\nrouter.use('/students', studentsRouter);\nrouter.use('/marks', marksRouter);\nmodule.exports = router;\n\n// --- routes/students.js ---\nconst express = require('express');\nconst router = express.Router();\nconst profileRouter = require('./profile');\nrouter.use('/profile', profileRouter);\nmodule.exports = router;\n\n// --- routes/profile.js ---\nconst express = require('express');\nconst router = express.Router();\nrouter.use((req, res, next) => {\nconsole.log('Profile middleware');\nnext();\n});\nrouter.get('/view', (req, res) => {\nres.send('Student Profile View');\n});\nrouter.get('/:id', (req, res) => {\nres.send(`Student Profile ID: ${req.params.id}`);\n});\nmodule.exports = router;\n\n// --- routes/marks.js ---\nconst express = require('express');\nconst router = express.Router();\nrouter.get('/view', (req, res) => {\nres.send('Marks View');\n});\nrouter.get('/:id', (req, res) => {\nres.send(`Marks for Student ID: ${req.params.id}`);\n});\nmodule.exports = router;\n\n// --- app.js ---\nconst express = require('express');\nconst app = express();\nconst collegeRouter = require('./routes/college');\napp.use('/college', collegeRouter);\napp.listen(3000, () => {\nconsole.log('Server running on port 3000');\n});",
+    3: "// --- middleware/validator.js ---\nconst { body } = require('express-validator');\nexports.userValidation = [\nbody('name').notEmpty().withMessage('Name is required'),\nbody('email').isEmail().withMessage('Invalid email format'),\nbody('age').isInt({ min: 18 }).withMessage('Age must be at least 18')\n];\n\n// --- routes/userRoutes.js ---\nconst express = require('express');\nconst router = express.Router();\nconst { validationResult } = require('express-validator');\nconst { userValidation } = require('../middleware/validator');\nrouter.post('/register', userValidation, (req, res) => {\nconst errors = validationResult(req);\nif (!errors.isEmpty()) {\nreturn res.status(400).json({ errors: errors.array() });\n}\nres.send('Validation Successful');\n});\nmodule.exports = router;\n\n// --- app.js ---\nconst express = require('express');\nconst app = express();\nconst userRoutes = require('./routes/userRoutes');\napp.use(express.json());\napp.use('/user', userRoutes);\napp.listen(3000, () => {\nconsole.log('Server running at http://localhost:3000');\n});",
+    4: "// --- app.js ---\nconst express = require('express');\nconst mongoose = require('mongoose');\nconst app = express();\napp.use(express.json());\napp.set('port', 3000);\nmongoose.connect('mongodb://127.0.0.1:27017/CollegeDB')\n.then(() => console.log('MongoDB connected'))\n.catch(err => console.log(err));\nconst studentSchema = new mongoose.Schema({\nname: String,\nusn: String,\nbranch: String,\nsemester: Number\n});\nconst Student = mongoose.model('Student', studentSchema);\napp.post('/students', async (req, res) => {\ntry {\nconst student = new Student(req.body);\nawait student.save();\nres.status(201).json({\nmessage: 'Student created successfully',\nstudent: student\n});\n} catch (err) {\nres.status(500).json({\nmessage: 'Error creating student',\nerror: err.message\n});\n}\n});\napp.get('/students', async (req, res) => {\ntry {\nconst students = await Student.find();\nres.status(200).json({\nmessage: 'Students retrieved successfully',\nstudents: students\n});\n} catch (err) {\nres.status(500).json({\nmessage: 'Error retrieving students',\nerror: err.message\n});\n}\n});\napp.listen(3000, () => {\nconsole.log('Server running on port 3000');\n});\nmodule.exports = app;",
+    5: "// --- app.js ---\nconst express = require('express');\nconst mongoose = require('mongoose');\nconst app = express();\napp.use(express.json());\nmongoose.connect('mongodb://127.0.0.1:27017/CollegeDB')\n.then(() => console.log('MongoDB connected'))\n.catch(err => console.log(err));\nconst studentSchema = new mongoose.Schema({\nname: String,\nusn: String,\nbranch: String,\nsemester: Number\n});\nconst Student = mongoose.model('Student', studentSchema);\napp.put('/students/:usn', async (req, res) => {\ntry {\nconst student = await Student.findOneAndUpdate(\n{ usn: req.params.usn },\nreq.body,\n{ new: true, runValidators: true }\n);\nif (!student) {\nreturn res.status(404).json({\nmessage: 'Student not found'\n});\n}\nres.status(200).json({\nmessage: 'Student updated successfully',\nstudent: student\n});\n} catch (err) {\nres.status(500).json({\nmessage: 'Error updating student',\nerror: err.message\n});\n}\n});\napp.delete('/students/:usn', async (req, res) => {\ntry {\nconst student = await Student.findOneAndDelete({\nusn: req.params.usn\n});\nif (!student) {\nreturn res.status(404).json({\nmessage: 'Student not found'\n});\n}\nres.status(200).json({\nmessage: 'Student deleted successfully',\nstudent: student\n});\n} catch (err) {\nres.status(500).json({\nmessage: 'Error deleting student',\nerror: err.message\n});\n}\n});\napp.listen(3000, () => {\nconsole.log('Server running on port 3000');\n});\nmodule.exports = app;"
+};
+
+for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('code-' + i);
+    if (el) el.textContent = codes[i];
+}
+
+let toastTimer = null;
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 1200);
+}
+
+function copyCode(num) {
+    const text = codes[num];
+    const btn = document.getElementById('btn-' + num);
+    const label = document.getElementById('label-' + num);
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+
+    if (btn && label) {
+        btn.classList.add('copied');
+        label.textContent = 'COPIED ✓';
+        showToast('Program ' + num + ' copied!');
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            label.textContent = 'CLICK TO COPY';
+        }, 1200);
+    }
+}
+
+function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+        document.execCommand('copy');
+    } catch (e) {}
+    document.body.removeChild(ta);
+}
+
+window.addEventListener('keydown', (e) => {
+    if (['1', '2', '3', '4', '5'].includes(e.key)) {
+        copyCode(parseInt(e.key));
+    }
+});
+</script>
+</body>
+</html>
