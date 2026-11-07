@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@page {
+    size: A4 portrait;
+    margin: 6mm 8mm 6mm 8mm;
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 7.2pt;
+    line-height: 1.13;
+    color: #111111;
+    background: #ffffff;
+}
+.page {
+    page-break-after: always;
+    break-after: page;
+    height: 283mm;
+    max-height: 283mm;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.page:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+}
+.page-title {
+    font-size: 8.5pt;
+    font-weight: bold;
+    border-bottom: 1.5px solid #222;
+    padding-bottom: 2px;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.sec-title {
+    font-size: 7.2pt;
+    font-weight: bold;
+    background: #f0f0f0;
+    border-left: 3px solid #444;
+    padding: 1px 4px;
+    margin-top: 3px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 7pt;
+    line-height: 1.12;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.p4-pre {
+    font-size: 6.8pt;
+    line-height: 1.11;
+}
+.box {
+    border: 1px solid #ccc;
+    background: #fafafa;
+    padding: 3px 5px;
+    margin-top: 1px;
+    margin-bottom: 3px;
+}
+.two-col-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5mm;
+    height: 100%;
+}
+.col-half {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.col-half .page-title {
+    font-size: 7.8pt;
+}
+.col-half pre {
+    font-size: 6.7pt;
+    line-height: 1.11;
+}
+.col-half .box {
+    padding: 2px 4px;
+    font-size: 6.7pt;
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: PROGRAM 3 -->
+<div class="page">
+    <div class="page-title">PROGRAM 3: ERROR HANDLING, STATIC RESOURCES AND RATE-LIMITING</div>
+    <div class="sec-title">COMMANDS TO RUN</div>
+    <div class="box"><pre>npm init -y
+npm install express express-rate-limit
+node app.js</pre></div>
+    <div class="sec-title">SOURCE CODE</div>
+    <pre>// --- public/index.html ---
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Express Static Resource Demo&lt;/title&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to Express.js&lt;/h1&gt;
+&lt;p&gt;This page demonstrates static resources.&lt;/p&gt;
+&lt;img src="image.jpg" width="300"&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+// --- public/style.css ---
+body{
+font-family: Arial;
+text-align: center;
+}
+h1{
+color: blue;
+}
+p{
+color: green;
+}
+
+// --- app.js ---
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const app = express();
+app.use(express.static('public'));
+const limiter = rateLimit({
+windowMs: 1 * 60 * 1000,
+max: 5,
+message: 'Too many requests, please try again later.'
+});
+app.use(limiter);
+app.get('/hello', (req, res) =&gt; {
+res.send('Hello Express.js');
+});
+app.use((req, res) =&gt; {
+res.status(404).send('Page Not Found');
+});
+app.listen(3000, () =&gt; {
+console.log('Server running at http://localhost:3000');
+});</pre>
+    <div class="sec-title">OUTPUT &amp; TESTING</div>
+    <div class="box"><pre>GET http://localhost:3000/
+-&gt; Displays index.html with CSS and image (Status: 200 OK)
+
+GET http://localhost:3000/hello
+-&gt; Hello Express.js (Status: 200 OK)
+
+GET http://localhost:3000/xyz
+-&gt; Page Not Found (Status: 404 Not Found)
+
+After 5 requests in 1 minute:
+-&gt; Too many requests, please try again later. (Status: 429)</pre></div>
+</div>
+
+<!-- PAGE 2: PROGRAM 4 -->
+<div class="page">
+    <div class="page-title">PROGRAM 4: HIERARCHICAL ROUTING IN EXPRESS.JS</div>
+    <div class="sec-title">COMMANDS TO RUN</div>
+    <div class="box"><pre>npm init -y
+npm install express
+node app.js</pre></div>
+    <div class="sec-title">SOURCE CODE</div>
+    <pre class="p4-pre">// --- routes/college.js ---
+const express = require('express');
+const router = express.Router();
+const studentsRouter = require('./students');
+const marksRouter = require('./marks');
+router.use((req, res, next) =&gt; {
+console.log('College middleware:', req.method, req.originalUrl);
+next();
+});
+router.use('/students', studentsRouter);
+router.use('/marks', marksRouter);
+module.exports = router;
+
+// --- routes/students.js ---
+const express = require('express');
+const router = express.Router();
+const profileRouter = require('./profile');
+router.use('/profile', profileRouter);
+module.exports = router;
+
+// --- routes/profile.js ---
+const express = require('express');
+const router = express.Router();
+router.use((req, res, next) =&gt; {
+console.log('Profile middleware');
+next();
+});
+router.get('/view', (req, res) =&gt; {
+res.send('Student Profile View');
+});
+router.get('/:id', (req, res) =&gt; {
+res.send(`Student Profile ID: ${req.params.id}`);
+});
+module.exports = router;
+
+// --- routes/marks.js ---
+const express = require('express');
+const router = express.Router();
+router.get('/view', (req, res) =&gt; {
+res.send('Marks View');
+});
+router.get('/:id', (req, res) =&gt; {
+res.send(`Marks for Student ID: ${req.params.id}`);
+});
+module.exports = router;
+
+// --- app.js ---
+const express = require('express');
+const app = express();
+const collegeRouter = require('./routes/college');
+app.use('/college', collegeRouter);
+app.listen(3000, () =&gt; {
+console.log('Server running on port 3000');
+});</pre>
+    <div class="sec-title">OUTPUT &amp; TESTING</div>
+    <div class="box"><pre>GET http://localhost:3000/college/students/profile/view
+-&gt; Student Profile View
+
+GET http://localhost:3000/college/students/profile/101
+-&gt; Student Profile ID: 101
+
+GET http://localhost:3000/college/marks/view
+-&gt; Marks View
+
+GET http://localhost:3000/college/marks/101
+-&gt; Marks for Student ID: 101
+
+Console Log Output:
+College middleware: GET /college/students/profile/view
+Profile middleware</pre></div>
+</div>
+
+<!-- PAGE 3: PROGRAM 5 -->
+<div class="page">
+    <div class="page-title">PROGRAM 5: REQUEST VALIDATION USING EXPRESS-VALIDATOR</div>
+    <div class="sec-title">COMMANDS TO RUN</div>
+    <div class="box"><pre>npm init -y
+npm install express express-validator
+node app.js</pre></div>
+    <div class="sec-title">SOURCE CODE</div>
+    <pre>// --- middleware/validator.js ---
+const { body } = require('express-validator');
+exports.userValidation = [
+body('name').notEmpty().withMessage('Name is required'),
+body('email').isEmail().withMessage('Invalid email format'),
+body('age').isInt({ min: 18 }).withMessage('Age must be at least 18')
+];
+
+// --- routes/userRoutes.js ---
+const express = require('express');
+const router = express.Router();
+const { validationResult } = require('express-validator');
+const { userValidation } = require('../middleware/validator');
+router.post('/register', userValidation, (req, res) =&gt; {
+const errors = validationResult(req);
+if (!errors.isEmpty()) {
+return res.status(400).json({ errors: errors.array() });
+}
+res.send('Validation Successful');
+});
+module.exports = router;
+
+// --- app.js ---
+const express = require('express');
+const app = express();
+const userRoutes = require('./routes/userRoutes');
+app.use(express.json());
+app.use('/user', userRoutes);
+app.listen(3000, () =&gt; {
+console.log('Server running at http://localhost:3000');
+});</pre>
+    <div class="sec-title">OUTPUT &amp; TESTING</div>
+    <div class="box"><pre>POST http://localhost:3000/user/register
+Valid JSON: {"name": "John", "email": "john@gmail.com", "age": 25}
+Response: Validation Successful (Status: 200 OK)
+
+Invalid JSON: {"name": "", "email": "abc", "age": 15}
+Response: Status 400 Bad Request
+{"errors": [{"msg": "Name is required"}, {"msg": "Invalid email format"}, {"msg": "Age must be at least 18"}]}</pre></div>
+</div>
+
+<!-- PAGE 4: PROGRAM 6 & 7 SIDE BY SIDE -->
+<div class="page">
+    <div class="page-title" style="margin-bottom: 4px;">PROGRAM 6 &amp; PROGRAM 7: MONGOOSE REST APIS</div>
+    <div class="two-col-container">
+        <!-- LEFT: PROGRAM 6 -->
+        <div class="col-half" style="border-right: 1px dashed #bbb; padding-right: 2.5mm;">
+            <div class="page-title" style="border-bottom: 1px solid #777;">PROG 6: MONGOOSE POST & GET (CREATE & READ)</div>
+            <div class="sec-title">COMMANDS TO RUN</div>
+            <div class="box"><pre>npm init -y
+npm install express mongoose
+node app.js</pre></div>
+            <div class="sec-title">SOURCE CODE</div>
+            <pre>// --- app.js ---
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+app.use(express.json());
+app.set('port', 3000);
+mongoose.connect('mongodb://127.0.0.1:27017/CollegeDB')
+.then(() =&gt; console.log('MongoDB connected'))
+.catch(err =&gt; console.log(err));
+const studentSchema = new mongoose.Schema({
+name: String,
+usn: String,
+branch: String,
+semester: Number
+});
+const Student = mongoose.model('Student', studentSchema);
+app.post('/students', async (req, res) =&gt; {
+try {
+const student = new Student(req.body);
+await student.save();
+res.status(201).json({
+message: 'Student created successfully',
+student: student
+});
+} catch (err) {
+res.status(500).json({
+message: 'Error creating student',
+error: err.message
+});
+}
+});
+app.get('/students', async (req, res) =&gt; {
+try {
+const students = await Student.find();
+res.status(200).json({
+message: 'Students retrieved successfully',
+students: students
+});
+} catch (err) {
+res.status(500).json({
+message: 'Error retrieving students',
+error: err.message
+});
+}
+});
+app.listen(3000, () =&gt; {
+console.log('Server running on port 3000');
+});
+module.exports = app;</pre>
+            <div class="sec-title">OUTPUT &amp; TESTING</div>
+            <div class="box"><pre>POST http://localhost:3000/students
+Body: {"name": "Rahul", "usn": "4VV23IS001", "branch": "ISE", "semester": 5}
+Response (201 Created):
+{"message": "Student created successfully", "student": {"_id": "...", "name": "Rahul", "usn": "4VV23IS001", "branch": "ISE", "semester": 5}}
+
+GET http://localhost:3000/students
+Response (200 OK):
+{"message": "Students retrieved successfully", "students": [{"_id": "...", "name": "Rahul", "usn": "4VV23IS001", "branch": "ISE", "semester": 5}]}</pre></div>
+        </div>
+        <!-- RIGHT: PROGRAM 7 -->
+        <div class="col-half">
+            <div class="page-title" style="border-bottom: 1px solid #777;">PROG 7: MONGOOSE PUT & DELETE (UPDATE & DELETE)</div>
+            <div class="sec-title">COMMANDS TO RUN</div>
+            <div class="box"><pre>npm init -y
+npm install express mongoose
+node app.js</pre></div>
+            <div class="sec-title">SOURCE CODE</div>
+            <pre>// --- app.js ---
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+app.use(express.json());
+mongoose.connect('mongodb://127.0.0.1:27017/CollegeDB')
+.then(() =&gt; console.log('MongoDB connected'))
+.catch(err =&gt; console.log(err));
+const studentSchema = new mongoose.Schema({
+name: String,
+usn: String,
+branch: String,
+semester: Number
+});
+const Student = mongoose.model('Student', studentSchema);
+app.put('/students/:usn', async (req, res) =&gt; {
+try {
+const student = await Student.findOneAndUpdate(
+{ usn: req.params.usn },
+req.body,
+{ new: true, runValidators: true }
+);
+if (!student) {
+return res.status(404).json({
+message: 'Student not found'
+});
+}
+res.status(200).json({
+message: 'Student updated successfully',
+student: student
+});
+} catch (err) {
+res.status(500).json({
+message: 'Error updating student',
+error: err.message
+});
+}
+});
+app.delete('/students/:usn', async (req, res) =&gt; {
+try {
+const student = await Student.findOneAndDelete({
+usn: req.params.usn
+});
+if (!student) {
+return res.status(404).json({
+message: 'Student not found'
+});
+}
+res.status(200).json({
+message: 'Student deleted successfully',
+student: student
+});
+} catch (err) {
+res.status(500).json({
+message: 'Error deleting student',
+error: err.message
+});
+}
+});
+app.listen(3000, () =&gt; {
+console.log('Server running on port 3000');
+});
+module.exports = app;</pre>
+            <div class="sec-title">OUTPUT &amp; TESTING</div>
+            <div class="box"><pre>PUT http://localhost:3000/students/4VV23IS001
+Body: {"name": "Rahul Kumar", "branch": "CSE", "semester": 6}
+Response (200 OK):
+{"message": "Student updated successfully", "student": {"_id": "...", "name": "Rahul Kumar", "usn": "4VV23IS001", "branch": "CSE", "semester": 6}}
+
+DELETE http://localhost:3000/students/4VV23IS002
+Response (200 OK):
+{"message": "Student deleted successfully", "student": {"_id": "...", "name": "xyz", "usn": "4VV23IS002"}}</pre></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
