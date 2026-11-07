@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Program-6-api.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
