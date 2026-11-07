@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Req-validation-mechanism.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+</Solution>
